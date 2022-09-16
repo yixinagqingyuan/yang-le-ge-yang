@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+</head>
+
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-image: url('https://pic.qy566.com/snake/bg.jpeg');
+            background-size: cover;
+        }
+
+        #box {
+            width: 600px;
+            height: 600px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+        }
+
+        #temp {
+            width: 840px;
+            height: 120px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: auto;
+            bottom: 0;
+            background-image: url('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fup.92sucai.com%2Fimage%2F20180626%2F1529979993472449.jpg&refer=http%3A%2F%2Fup.92sucai.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1665795593&t=0c74935a1fa75d5861903e8249c15bbb');
+            background-size: contain;
+            border-radius: 16px;
+            display: flex;
+        }
+
+        .item {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+
+        .shadow {
+            box-shadow: 0 0 50px 10px #333 inset;
+        }
+
+        #source {
+            width: 260px;
+            height: 120px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #source1 {
+            width: 260px;
+            height: 120px;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .result {
+            width: 200px;
+            height: 120px;
+            border: 4px dashed cyan;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            background-color: #fff;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            display: none;
+        }
+
+        .restart {
+            width: 120px;
+            height: 40px;
+            line-height: 40px;
+            border: 1px solid #333;
+            text-align: center;
+            cursor: pointer;
+            margin: auto;
+        }
+    </style>
+
+    <body>
+        <div id="box"></div>
+        <div id="temp"></div>
+        <div id="source"></div>
+        <div id="source1"></div>
+        <div class="result">
+            <div>游戏结束，别灰心，你能行的！</div>
+            <div class="restart">重新开始</div>
+        </div>
+        <script>
+            $(function () {
+
+                const imgSrc = [
+                    'https://img01.yzcdn.cn/upload_files/2022/07/20/Fk1rj4gSaia1i8yD-FSO8CWLWlSu.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/16/Fo3SKNvQG5cIj3IspG_SOs_T216M.png!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/07/19/FsT754_weL6KZgUC2TuRWxr5zLnG.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/05/30/FguIz4XVMqAS3ft_7thNqlJrT0_F.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/05/09/FvG5_KInsbyhVq9W6xbygpo9jb9i.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/05/30/Fpht4CzextqfHA048FGU8m_t4NP5.jpeg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/15/FlTBO9tItc9TXslq6wYd87udb-6t.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/15/Fi77MVQB0xREZRQdzaKHyHNuG-yg.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/16/FtBQGLwuPQJBuIHs0LjxbaSJVloV.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/16/FrZxLRso63OS_oKTD6xXk6Ao4Z2C.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/05/09/FvpbuQ35dFtL_oOcjJCfgPuPseIY.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/05/16/FlvZNZzU96K_d0DzxgFv3mh5IDA3.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/15/Fi-VLtnXgalfGpC0w3Try3Tks5qv.jpg!280x280.jpg',
+                    'https://img01.yzcdn.cn/upload_files/2022/03/15/Fn1QBOetrZhCcKMoVFU-9lJN1gnP.jpg!280x280.jpg',
+                ]
+                // 随机乱序
+
+                function randomArr(array) {
+                    const arr = [].concat(array)
+                    for (let i = arr.length - 1; i >= 0; i--) {
+                        const inx = Math.floor(Math.random() * i + 1)
+                        const next = arr[inx]
+                        arr[inx] = arr[i]
+                        arr[i] = next
+                    }
+                    return arr
+                }
+                $('.restart').click(start)
+                function start() {
+                    $('#box').empty()
+                    $('#temp').empty()
+                    $('#source').empty()
+                    $('#source1').empty()
+                    $('.result').fadeOut()
+                    let zIndex = 0
+                    let source = []
+                    let temp = {}
+                    // 生成 12*14个待消除元素
+                    for (let i = 0; i < 12; i++) {
+                        imgSrc.map((v, m) => {
+                            console.log(m)
+                            source.push({ src: v, inx: m })
+                        })
+                    }
+                    source = randomArr(source)
+                   // 分为5层，进行排列，其中层数从5至0递减，然后内部双层循环进行5*层数递减页面布局，元素依次由source.slice(0)来得到，维护图片索引 inx
+                    for (let k = 5; k > 0; k--) {
+                        for (let i = 0; i < 5; i++) {
+                            for (let j = 0; j < k; j++) {
+                                let div = $('<div>')
+                                div.addClass('item')
+                                div.addClass(`${i}-${j}-${k}`)
+                                div.attr('x', i)
+                                div.attr('y', j)
+                                div.attr('z', k)
+                                div.css('position', 'absolute')
+                                let img = source.splice(0, 1)
+                                div.css('left', 120 * j - Math.random() * 10 * k + 'px')
+                                div.css('top', 120 * i - Math.random() * 10 * k + 'px')
+                                div.attr('inx', img[0].inx)
+                                div.css('backgroundImage', `url(${img[0].src})`)
+                                div.click(function () {
+                                    if (!$(this).hasClass('shadow')) {
+                                        if (temp[$(this).attr('inx')]) {
+                                            temp[$(this).attr('inx')] += 1
+                                        } else {
+                                            temp[$(this).attr('inx')] = 1
+                                        }
+                                        let e = $(this).detach()
+                                        e.css('position', 'unset')
+                                        $('#temp').append(e)
+                                        $('.item').each((i, v) => {
+                                            $(v).removeClass('shadow')
+                                            let x = $(v).attr('x')
+                                            let y = $(v).attr('y')
+                                            let z = $(v).attr('z')
+                                            let ele = $(`.${x}-${y}-${z - 1}`)
+                                            let ele1 = $(`.${x + 1}-${y + 1}-${z - 1}`)
+                                            if (ele.length || ele1.length) {
+                                                $(v).addClass('shadow')
+                                            }
+                                        })
+                                        if (temp[$(this).attr('inx')] === 3) {
+                                            $(`#temp div[inx=${$(this).attr('inx')}]`).remove()
+                                            temp[$(this).attr('inx')] = 0
+                                        }
+                                        let num = 0
+                                        for (let i in temp) {
+                                            num += temp[i]
+                                        }
+                                        if (num >= 7) {
+                                            $('.item').off('click')
+                                            $('.result').fadeIn()
+                                        }
+                                    }
+                                })
+                                $('#box').append(div)
+
+                            }
+                        }
+                    }
+                    let len = Math.ceil(source.length / 2)
+                    source.forEach((v, i) => {
+                        let div = $('<div>')
+                        div.addClass('item')
+                        div.attr('inx', v.inx)
+                        div.css('backgroundImage', `url(${v.src})`)
+                        div.css('position', 'absolute')
+                        div.css('top', 0)
+                        if (i > len) {
+                            div.css('right', `${5 * (i - len)}px`)
+                            $('#source1').append(div)
+
+                        } else {
+                            div.css('left', `${5 * i}px`)
+                            $('#source').append(div)
+                        }
+                        div.click(function () {
+                            if (temp[$(this).attr('inx')]) {
+                                temp[$(this).attr('inx')] += 1
+                            } else {
+                                temp[$(this).attr('inx')] = 1
+                            }
+
+                            let e = $(this).detach()
+                            e.css('position', 'unset')
+                            $('#temp').append(e)
+                            if (temp[$(this).attr('inx')] === 3) {
+                                $(`#temp div[inx=${$(this).attr('inx')}]`).remove()
+                                temp[$(this).attr('inx')] = 0
+                            }
+                            let num = 0
+                            for (let i in temp) {
+                                num += temp[i]
+                            }
+                            if (num >= 7) {
+                                $('.item').off('click')
+                                $('.result').fadeIn()
+                            }
+                        })
+                    })
+                    //判断是否被覆盖，被覆盖时添加shadow类
+                    $('.item').each((i, v) => {
+                        let x = $(v).attr('x')
+                        let y = $(v).attr('y')
+                        let z = $(v).attr('z')
+                        let ele = $(`.${x}-${y}-${z - 1}`)
+                        let ele1 = $(`.${x + 1}-${y + 1}-${z - 1}`)
+                        if (ele.length || ele1.length) {
+                            $(v).addClass('shadow')
+                        }
+                    })
+                }
+                start()
+            })
+        </script>
+    </body>
+</body>
+
+</html>
